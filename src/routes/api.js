@@ -1,8 +1,9 @@
 const express = require('express')
 const router = express.Router()
 
-router.get('/', (res, req) => {
-  req.send('<h1>Api Admin</h1>')
-})
+const users = require('./api/user.route')
 
-module.exports = router
+// Routes
+router.use('/users', users);
+
+module.exports = router;
