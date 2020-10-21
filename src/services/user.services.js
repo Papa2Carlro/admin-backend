@@ -24,15 +24,20 @@ exports.createUser = async function (user) {
   // Creating a new Mongoose Object by using the new keyword
 
   // Hash password
-  // const hashedPassword = bcrypt.hashSync(user.password, 8);
+  const hashedPassword = bcrypt.hashSync(user.password, 8);
 
   const newUser = new User({
     name: user.name,
     surname: user.surname,
     nickname: user.nickname,
+    avatar: user.avatar,
     email: user.email,
-    password: user.password,
-    date: new Date()
+    password: hashedPassword,
+    required: false,
+    language: user.language,
+    displayName: user.displayName,
+    role: user.role,
+    registration: new Date()
   })
 
   try {
@@ -43,27 +48,32 @@ exports.createUser = async function (user) {
     });
     return token;
   } catch (err) {
-    // return a Error Fields
+    // return a Error
     throw err
   }
 }
 
-// exports.loginUser = async function (user) {
-//   // Creating a new Mongoose Object by using the new keyword
-//   try {
-//     // Find the User
-//     var _details = await User.findOne({ email: user.email });
-//     var passwordIsValid = bcrypt.compareSync(user.password, _details.password);
-//     if (!passwordIsValid) throw Error("Invalid username/password")
-//     var token = jwt.sign({id: _details._id}, config.SECRET, {
-//       expiresIn: 86400 // expires in 24 hours
-//     });
-//     return token;
-//   } catch (e) {
-//     // return a Error message describing the reason
-//     throw Error("Error while Login User")
-//   }
-// }
+exports.loginUser = async function (user, typeLogin) {
+  // Creating a new Mongoose Object by using the new keyword
+  try {
+    // Find the User
+    const query = typeLogin === 'email' ? {email: user.login} : {nickname: user.login}
+
+    const _details = await User.findOne(query);
+    if (!_details) throw "Пользователя не существует"
+
+    const passwordIsValid = bcrypt.compareSync(user.password, _details.password);
+    if (!passwordIsValid) throw "Неправильный пароль"
+
+    const token = jwt.sign({id: _details._id}, config.secret, {
+      expiresIn: 86400 // expires in 24 hours
+    });
+    return token;
+  } catch (err) {
+    // return a Error message describing the reason
+    throw err
+  }
+}
 
 // exports.deleteUser = async function (id) {
 //   // Delete the User

@@ -8,8 +8,13 @@ exports.createUser = async function (req, res) {
     name: req.body.name,
     surname: req.body.surname,
     nickname: req.body.nickname,
+    avatar: req.body.avatar,
     email: req.body.email,
-    password: req.body.password
+    password: req.body.password,
+    required: req.body.required,
+    language: req.body.language,
+    displayName: req.body.displayName,
+    role: req.body.role
   }
   try {
     await UserService.getUserByEmail(User.email, (err, user) => {
@@ -18,6 +23,9 @@ exports.createUser = async function (req, res) {
     await UserService.getUserByNickname(User.nickname, (err, user) => {
       if (user) errField.nickname = 'Такой nickname уже существует!'
     })
+    if (!User.nickname) errField.nickname = 'Поле обезательно'
+    if (!User.email) errField.email = 'Поле обезательно'
+    if (!User.password) errField.password = 'Поле обезательно'
 
     if (Object.keys(errField).length) throw errField
 
@@ -26,7 +34,26 @@ exports.createUser = async function (req, res) {
     return res.status(201).json({ok: true, msg: "Пользователь успешно зарегистрирован"})
   } catch (err) {
     //Return an Error Response Message with Code and the Error Message.
-    return res.status(400).json({ok: false, msg: "Что то не так", fields: err})
+    return res.status(400).json({ok: false, msg: err})
+  }
+}
+
+exports.loginUser = async function (req, res, next) {
+  // Req.Body contains the form submit values.
+  const User = {
+    login: req.body.login,
+    password: req.body.password,
+    required: req.body.required
+  }
+  try {
+    // Calling the Service function with the new object from the Request Body
+    const typeLogin = User.login.indexOf('@') < 0 ? 'nickname' : 'email'
+
+    await UserService.loginUser(User, typeLogin);
+    return res.status(201).json({ok: true, msg: "Succesfully login"})
+  } catch (err) {
+    //Return an Error Response Message with Code and the Error Message.
+    return res.status(400).json({ok: false, msg: err})
   }
 }
 
@@ -37,23 +64,6 @@ exports.createUser = async function (req, res) {
 //     res.status(200).send("Succesfully User Deleted");
 //   } catch (e) {
 //     return res.status(400).json({status: 400, message: e.message})
-//   }
-// }
-
-
-// exports.loginUser = async function (req, res, next) {
-//   // Req.Body contains the form submit values.
-//   var User = {
-//     email: req.body.email,
-//     password: req.body.password
-//   }
-//   try {
-//     // Calling the Service function with the new object from the Request Body
-//     var loginUser = await UserService.loginUser(User);
-//     return res.status(201).json({data: loginUser, message: "Succesfully login"})
-//   } catch (e) {
-//     //Return an Error Response Message with Code and the Error Message.
-//     return res.status(400).json({status: 400, message: "Invalid username or password"})
 //   }
 // }
 
