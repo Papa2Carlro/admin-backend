@@ -3,7 +3,6 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
-const passport = require('passport')
 
 // Url
 const api = require('./routes/api')
@@ -17,12 +16,6 @@ const PORT = process.env.PORT || config.port
 
 // App
 const app = express()
-
-// Passport
-// app.use(passport.initialize())
-// app.use(passport.session())
-
-// require('./config/passport')(passport)
 
 // Plugins
 app.use(cors())

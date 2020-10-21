@@ -1,5 +1,7 @@
+// Services
 const UserService = require('../services/user.services');
 
+// Registration Controller
 exports.createUser = async function (req, res) {
   let errField = {}
 
@@ -11,22 +13,25 @@ exports.createUser = async function (req, res) {
     avatar: req.body.avatar,
     email: req.body.email,
     password: req.body.password,
-    required: req.body.required,
     language: req.body.language,
     displayName: req.body.displayName,
     role: req.body.role
   }
+
   try {
+    // Error Event
     await UserService.getUserByEmail(User.email, (err, user) => {
       if (user) errField.email = 'Такой email уже зарегистрирован!'
     })
     await UserService.getUserByNickname(User.nickname, (err, user) => {
       if (user) errField.nickname = 'Такой nickname уже существует!'
     })
-    if (!User.nickname) errField.nickname = 'Поле обезательно'
-    if (!User.email) errField.email = 'Поле обезательно'
-    if (!User.password) errField.password = 'Поле обезательно'
+    // Empty Field
+    if (!User.email) errField.email = 'Поле обезательно для заполнения'
+    if (!User.nickname) errField.nickname = 'Поле обезательно для заполнения'
+    if (!User.password) errField.password = 'Поле обезательно для заполнения'
 
+    // Throw out the error
     if (Object.keys(errField).length) throw errField
 
     // Calling the Service function with the new object from the Request Body
@@ -38,6 +43,7 @@ exports.createUser = async function (req, res) {
   }
 }
 
+// Login Controller
 exports.loginUser = async function (req, res, next) {
   // Req.Body contains the form submit values.
   const User = {
@@ -49,8 +55,8 @@ exports.loginUser = async function (req, res, next) {
     // Calling the Service function with the new object from the Request Body
     const typeLogin = User.login.indexOf('@') < 0 ? 'nickname' : 'email'
 
-    await UserService.loginUser(User, typeLogin);
-    return res.status(201).json({ok: true, msg: "Succesfully login"})
+    const user = await UserService.loginUser(User, typeLogin);
+    return res.status(201).json({ok: true,msg: "Succesfully login",token: user.token, user: user.user})
   } catch (err) {
     //Return an Error Response Message with Code and the Error Message.
     return res.status(400).json({ok: false, msg: err})

@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const passport = require('passport')
 
 // Model
 const User = require('../models/User.model');
@@ -7,6 +8,7 @@ const User = require('../models/User.model');
 // Config
 const config = require('../config/db');
 
+// Getters
 exports.getUserByEmail = async function (email, callback) {
   const query = {email: email}
   await User.findOne(query, callback)
@@ -19,8 +21,8 @@ exports.getUserById = async function (id, callback) {
   await User.findById(id, callback)
 }
 
+// Create User
 exports.createUser = async function (user) {
-
   // Creating a new Mongoose Object by using the new keyword
 
   // Hash password
@@ -33,7 +35,6 @@ exports.createUser = async function (user) {
     avatar: user.avatar,
     email: user.email,
     password: hashedPassword,
-    required: false,
     language: user.language,
     displayName: user.displayName,
     role: user.role,
@@ -43,16 +44,17 @@ exports.createUser = async function (user) {
   try {
     // Saving the User
     const savedUser = await newUser.save();
-    const token = jwt.sign({id: savedUser._id}, config.secret, {
+    const _token = jwt.sign({id: savedUser._id}, config.secret, {
       expiresIn: 86400 // expires in 24 hours
     });
-    return token;
+    return _token;
   } catch (err) {
     // return a Error
     throw err
   }
 }
 
+// Login
 exports.loginUser = async function (user, typeLogin) {
   // Creating a new Mongoose Object by using the new keyword
   try {
@@ -65,10 +67,19 @@ exports.loginUser = async function (user, typeLogin) {
     const passwordIsValid = bcrypt.compareSync(user.password, _details.password);
     if (!passwordIsValid) throw "Неправильный пароль"
 
-    const token = jwt.sign({id: _details._id}, config.secret, {
+    const _token = jwt.sign({id: _details._id}, config.secret, {
       expiresIn: 86400 // expires in 24 hours
     });
-    return token;
+    // Token for Client
+    return {
+      token: `JWT ${_token}`,
+      user: {
+        id: _details._id,
+        name: _details.name,
+        nickname: _details.nickname,
+        email: _details.email,
+      }
+    };
   } catch (err) {
     // return a Error message describing the reason
     throw err

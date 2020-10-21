@@ -8,7 +8,6 @@ const UserSchema = new mongoose.Schema({
   avatar: {type: String, default: 'default image'},
   email: String,
   password: String,
-  required: {type: Boolean, default: false},
   language: {type: String, default: 'en-En'},
   displayName: {type: String, default: 'nickname'},
   role: {type: String, default: 'user'},
