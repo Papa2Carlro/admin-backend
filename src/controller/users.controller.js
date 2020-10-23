@@ -39,7 +39,7 @@ exports.createUser = async function (req, res) {
     return res.status(201).json({ok: true, msg: "Пользователь успешно зарегистрирован"})
   } catch (err) {
     //Return an Error Response Message with Code and the Error Message.
-    return res.status(400).json({ok: false, msg: err})
+    return res.json({ok: false, msg: err})
   }
 }
 
@@ -49,17 +49,53 @@ exports.loginUser = async function (req, res, next) {
   const User = {
     login: req.body.login,
     password: req.body.password,
-    required: req.body.required
   }
   try {
     // Calling the Service function with the new object from the Request Body
     const typeLogin = User.login.indexOf('@') < 0 ? 'nickname' : 'email'
 
     const user = await UserService.loginUser(User, typeLogin);
-    return res.status(201).json({ok: true,msg: "Succesfully login",token: user.token, user: user.user})
+    return res.status(200).json({ok: true, msg: "Succesfully login", token: user.token, user: user.user})
   } catch (err) {
     //Return an Error Response Message with Code and the Error Message.
-    return res.status(400).json({ok: false, msg: err})
+    return res.json({ok: false, msg: err})
+  }
+}
+
+// Send Mail
+exports.sendPassword = async function (req, res, next) {
+  const email = req.body.email
+
+  try {
+    await UserService.sendPassword(email)
+    return res.status(200).json({ok: true, msg: 'Письмо отправленно'})
+  } catch (err) {
+    return res.json({ok: false, msg: err})
+  }
+}
+
+// Change Hash
+exports.changeHash = async function (req, res, next) {
+  const hash = req.body.hash
+
+  try {
+    await UserService.getByHash(hash)
+    return res.status(200).json({ok: true, msg: 'Пользователь найден'})
+  } catch (err) {
+    return res.json({ok: false, msg: err})
+  }
+}
+
+// Change Password
+exports.changePassword = async function (req, res, next) {
+  const password = req.body.password
+  const hash = req.body.hash
+
+  try {
+    await UserService.changePassword(password, hash)
+    return res.status(201).json({ok: true, msg: 'Пароль успешно изменен'})
+  } catch (err) {
+    return res.json({ok: false, msg: err})
   }
 }
 

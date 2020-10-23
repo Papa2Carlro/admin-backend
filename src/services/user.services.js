@@ -1,12 +1,15 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const passport = require('passport')
+const crypto = require('crypto')
 
 // Model
 const User = require('../models/User.model');
 
 // Config
 const config = require('../config/db');
+
+// Mailer
+const mailer = require('../utils/nodemail')
 
 // Getters
 exports.getUserByEmail = async function (email, callback) {
@@ -20,14 +23,23 @@ exports.getUserByNickname = async function (nickname, callback) {
 exports.getUserById = async function (id, callback) {
   await User.findById(id, callback)
 }
+exports.getByHash = async function (hash) {
+  try {
+    const user = await User.findOne({modify: hash})
+    if (!user) throw 'Пользователя не найденно'
+
+    return user
+  } catch (err) {
+    throw err
+  }
+}
 
 // Create User
 exports.createUser = async function (user) {
-  // Creating a new Mongoose Object by using the new keyword
-
   // Hash password
   const hashedPassword = bcrypt.hashSync(user.password, 8);
 
+  // Creating a new Mongoose Object by using the new keyword
   const newUser = new User({
     name: user.name,
     surname: user.surname,
@@ -65,7 +77,7 @@ exports.loginUser = async function (user, typeLogin) {
     if (!_details) throw "Пользователя не существует"
 
     const passwordIsValid = bcrypt.compareSync(user.password, _details.password);
-    if (!passwordIsValid) throw "Неправильный пароль"
+    if (!passwordIsValid) throw "Пароль неверный"
 
     const _token = jwt.sign({id: _details._id}, config.secret, {
       expiresIn: 86400 // expires in 24 hours
@@ -80,6 +92,63 @@ exports.loginUser = async function (user, typeLogin) {
         email: _details.email,
       }
     };
+  } catch (err) {
+    // return a Error message describing the reason
+    throw err
+  }
+}
+
+exports.sendPassword = async function (email) {
+  try {
+    // Find the User
+    const _details = await User.findOne({email: email});
+    if (!_details) throw "Пользователя не существует"
+
+    // Hash link
+    const hashedStr = await crypto.randomBytes(18).toString('hex');
+    const link = `http://localhost:8080/admin64x/reset-password?hash=${hashedStr}`
+
+    const messages = {
+      to: email,
+      subject: 'Запрос на смену пароля',
+      html: `<h3>Вы сделали запрос на смену пароля</h3>
+      <h5>Перейдите по ссылке что бы сменить пароль</h5>
+      <a target="_blank" href="${link}">${link}</a> 
+
+      <p>Данное письмо не требует ответа.</p>`
+    }
+    mailer(messages)
+
+    await User.findOneAndUpdate({email: email}, {modify: hashedStr}, {returnOriginal: false})
+  } catch (err) {
+    // return a Error message describing the reason
+    throw err
+  }
+}
+
+exports.changePassword = async function (password, hash) {
+  // Hash password
+  const hashedPassword = bcrypt.hashSync(password, 8);
+
+  try {
+    const _detail = await User.findOne({modify: hash})
+    if (!_detail) throw 'Пользователь не найден'
+
+    const messages = {
+      to: _detail.email,
+      subject: 'Смена пароля',
+      html: `<h3>Вы успешно сменили пароль</h3>
+      
+      <p style="margin: 10px 0 5px 0"><b>Ваши новые данные:</b></p> 
+      <p style="margin: 0 0 5px 0">Nickname: <b>${_detail.nickname}</b> </p>
+      <p style="margin-top: 0;">Password: <b>${password}</b></p>
+      
+      <br>
+      <p>Данное письмо не требует ответа.</p>`
+    }
+
+    await User.findOneAndUpdate({modify: hash}, {password: hashedPassword, modify: ''}, {returnOriginal: false})
+    await mailer(messages)
   } catch (err) {
     // return a Error message describing the reason
     throw err

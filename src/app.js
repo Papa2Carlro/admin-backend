@@ -4,6 +4,8 @@ const cors = require('cors')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
 
+mongoose.Promise = require('bluebird');
+
 // Url
 const api = require('./routes/api')
 
@@ -20,6 +22,8 @@ const app = express()
 // Plugins
 app.use(cors())
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(require('cookie-parser')());
 app.use(morgan('combined'))
 
 // Connect MongoDB

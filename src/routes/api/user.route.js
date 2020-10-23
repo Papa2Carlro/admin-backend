@@ -9,9 +9,15 @@ const UserController = require('../../controller/users.controller');
 // Authorize each API with middleware and map to the Controller Functions
 router.post('/add', UserController.createUser)
 router.post('/login', UserController.loginUser)
+router.post('/send-password', UserController.sendPassword)
+router.post('/modify', UserController.changeHash)
+router.post('/password', UserController.changePassword)
 
 // Export the Router
 module.exports = router;
 
 // /api/users/add
 // /api/users/login
+// /api/users/send-password
+// /api/users/modify
+// /api/users/password
