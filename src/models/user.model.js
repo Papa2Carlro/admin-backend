@@ -5,13 +5,14 @@ const UserSchema = new mongoose.Schema({
   name: String,
   surname: String,
   nickname: String,
-  avatar: {type: String, default: 'default image'},
+  avatar: {type: String, default: '/img/man.6f2bab19.png'},
   email: String,
   password: String,
+  biography: String,
   modify: {type: String, default: ''},
   language: {type: String, default: 'en-En'},
   displayName: {type: String, default: 'nickname'},
-  role: {type: String, default: 'user'},
+  role: {type: String, default: 'User'},
   registration: Date
 })
 

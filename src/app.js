@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
+const helmet = require('helmet');
 
 mongoose.Promise = require('bluebird');
 
@@ -21,10 +22,14 @@ const app = express()
 
 // Plugins
 app.use(cors())
+app.use(helmet());
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(require('cookie-parser')());
 app.use(morgan('combined'))
+app.use(require('cookie-parser')());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Disable
+app.disable('x-powered-by');
 
 // Connect MongoDB
 mongoose.connect(DBConfig.db, {useNewUrlParser: true, useUnifiedTopology: true})

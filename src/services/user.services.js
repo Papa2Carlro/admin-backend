@@ -48,6 +48,7 @@ exports.createUser = async function (user) {
     email: user.email,
     password: hashedPassword,
     language: user.language,
+    biography: user.biography,
     displayName: user.displayName,
     role: user.role,
     registration: new Date()
@@ -152,6 +153,30 @@ exports.changePassword = async function (password, hash) {
   } catch (err) {
     // return a Error message describing the reason
     throw err
+  }
+}
+
+exports.getUser = async function (nickname) {
+  try {
+    const _detail = await User.findOne({nickname: nickname})
+    if (!_detail) throw 'Пользователь не найден'
+
+    return _detail
+  } catch (err) {
+    // return a Error message describing the reason
+    throw err
+  }
+}
+
+exports.saveUser = async function (nickname, newUser) {
+  try {
+    const _detail = await User.findOne({nickname: nickname})
+    if (!_detail) throw 'Пользователь не найден'
+
+    await User.findOneAndUpdate({nickname: nickname}, newUser, {returnOriginal: false})
+  } catch (err) {
+    // return a Error message describing the reason
+    // throw err
   }
 }
 

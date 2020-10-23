@@ -13,6 +13,7 @@ exports.createUser = async function (req, res) {
     avatar: req.body.avatar,
     email: req.body.email,
     password: req.body.password,
+    biography: req.body.biography,
     language: req.body.language,
     displayName: req.body.displayName,
     role: req.body.role
@@ -50,6 +51,7 @@ exports.loginUser = async function (req, res, next) {
     login: req.body.login,
     password: req.body.password,
   }
+
   try {
     // Calling the Service function with the new object from the Request Body
     const typeLogin = User.login.indexOf('@') < 0 ? 'nickname' : 'email'
@@ -94,6 +96,54 @@ exports.changePassword = async function (req, res, next) {
   try {
     await UserService.changePassword(password, hash)
     return res.status(201).json({ok: true, msg: 'Пароль успешно изменен'})
+  } catch (err) {
+    return res.json({ok: false, msg: err})
+  }
+}
+
+// Get User
+exports.getUser = async function (req, res, next) {
+  const nickname = req.params.name
+
+  try {
+    const user = await UserService.getUser(nickname)
+    return res.status(200).json({ok: true, body: user})
+  } catch (err) {
+    return res.json({ok: false, msg: err})
+  }
+}
+
+exports.saveUser = async function (req, res, next) {
+  const nickname = req.params.name
+  let errField = {}
+
+  // Req.Body contains the form submit values.
+  const User = {
+    name: req.body.name,
+    surname: req.body.surname,
+    email: req.body.email,
+    biography: req.body.biography,
+    language: req.body.language,
+    displayName: req.body.displayName,
+    role: req.body.role
+  }
+  try {
+    // Error Event
+    await UserService.getUserByEmail(User.email, (err, user) => {
+      if (user) {
+        if (User.email !== user.email) {
+          errField.email = 'Такой email уже зарегистрирован!'
+        }
+      }
+    })
+    // Empty Field
+    if (!User.email) errField.email = 'Поле обезательно для заполнения'
+
+    // Throw out the error
+    if (Object.keys(errField).length) throw errField
+
+    await UserService.saveUser(nickname, User)
+    return res.status(200).json({ok: true, msg: 'Настройки пременены'})
   } catch (err) {
     return res.json({ok: false, msg: err})
   }
