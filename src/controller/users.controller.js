@@ -124,7 +124,6 @@ exports.saveUser = async function (req, res, next) {
     email: req.body.email,
     biography: req.body.biography,
     language: req.body.language,
-    displayName: req.body.displayName,
     role: req.body.role
   }
   try {

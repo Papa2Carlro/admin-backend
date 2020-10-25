@@ -20,9 +20,18 @@ const PORT = process.env.PORT || config.port
 // App
 const app = express()
 
+// CORS middleware
+const allowCrossDomain = function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  next();
+}
+
 // Plugins
 app.use(cors())
 app.use(helmet());
+app.use(allowCrossDomain)
 app.use(bodyParser.json())
 app.use(morgan('combined'))
 app.use(require('cookie-parser')());

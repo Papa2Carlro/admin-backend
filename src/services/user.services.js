@@ -49,7 +49,6 @@ exports.createUser = async function (user) {
     password: hashedPassword,
     language: user.language,
     biography: user.biography,
-    displayName: user.displayName,
     role: user.role,
     registration: new Date()
   })
