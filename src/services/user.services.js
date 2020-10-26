@@ -167,6 +167,17 @@ exports.getUser = async function (nickname) {
   }
 }
 
+exports.getUsers = async function () {
+  try {
+    const _detail = await User.find({})
+
+    return _detail
+  } catch (err) {
+    // return a Error message describing the reason
+    throw err
+  }
+}
+
 exports.saveUser = async function (nickname, newUser) {
   try {
     const _detail = await User.findOne({nickname: nickname})
@@ -189,23 +200,5 @@ exports.saveUser = async function (nickname, newUser) {
 //     return deleted;
 //   } catch (e) {
 //     throw Error("Error Occured while Deleting the User")
-//   }
-// }
-
-// Async function to get the User List
-// exports.getUsers = async function (query, page, limit) {
-//   // Options setup for the mongoose paginate
-//   var options = {
-//     page,
-//     limit
-//   }
-//   // Try Catch the awaited promise to handle the error
-//   try {
-//     var Users = await User.paginate(query, options)
-//     // Return the Userd list that was retured by the mongoose promise
-//     return Users;
-//   } catch (e) {
-//     // return a Error message describing the reason
-//     throw Error('Error while Paginating Users');
 //   }
 // }

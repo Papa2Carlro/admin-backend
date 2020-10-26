@@ -15,7 +15,6 @@ exports.createUser = async function (req, res) {
     password: req.body.password,
     biography: req.body.biography,
     language: req.body.language,
-    displayName: req.body.displayName,
     role: req.body.role
   }
 
@@ -107,6 +106,16 @@ exports.getUser = async function (req, res, next) {
 
   try {
     const user = await UserService.getUser(nickname)
+    return res.status(200).json({ok: true, body: user})
+  } catch (err) {
+    return res.json({ok: false, msg: err})
+  }
+}
+
+// Get Users
+exports.getUsers = async function (req, res, next) {
+  try {
+    const user = await UserService.getUsers()
     return res.status(200).json({ok: true, body: user})
   } catch (err) {
     return res.json({ok: false, msg: err})

@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
   biography: String,
   modify: {type: String, default: ''},
   language: {type: String, default: 'en-En'},
-  role: {type: String, default: 'User'},
+  role: {type: String, default: 'user'},
   registration: Date
 })
 
