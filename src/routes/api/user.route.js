@@ -15,13 +15,23 @@ router.post('/profile/:name', UserController.saveUser)
 router.get('/profile/:name', UserController.getUser)
 router.get('/', UserController.getUsers)
 
+// DELETE
+router.delete('/profile/:name', UserController.removeUser)
+
 // Export the Router
 module.exports = router;
 
-// /api/users
+// POST
 // /api/users/add
 // /api/users/login
-// /api/users/send-password
 // /api/users/modify
-// /api/users/password
 // /api/users/profile
+// /api/users/password
+// /api/users/send-password
+
+// GET
+// /api/users
+// /api/users/profile/:name
+
+// DELETE
+// /api/users/profile/:name

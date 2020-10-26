@@ -190,15 +190,16 @@ exports.saveUser = async function (nickname, newUser) {
   }
 }
 
-// exports.deleteUser = async function (id) {
-//   // Delete the User
-//   try {
-//     var deleted = await User.remove({_id: id})
-//     if (deleted.n === 0 && deleted.ok === 1) {
-//       throw Error("User Could not be deleted")
-//     }
-//     return deleted;
-//   } catch (e) {
-//     throw Error("Error Occured while Deleting the User")
-//   }
-// }
+exports.deleteUser = async function (nickname) {
+
+  console.log(nickname)
+
+  // Delete the User
+  try {
+    const deleted = await User.remove({nickname: nickname})
+    if (deleted.n === 0 && deleted.ok === 1) throw `Не удалось удалить пользователя`
+    return deleted;
+  } catch (err) {
+    throw err
+  }
+}

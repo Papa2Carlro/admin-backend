@@ -157,27 +157,13 @@ exports.saveUser = async function (req, res, next) {
   }
 }
 
-// exports.removeUser = async function (req, res, next) {
-//   var id = req.params.id;
-//   try {
-//     var deleted = await UserService.deleteUser(id);
-//     res.status(200).send("Succesfully User Deleted");
-//   } catch (e) {
-//     return res.status(400).json({status: 400, message: e.message})
-//   }
-// }
+exports.removeUser = async function (req, res, next) {
+  const nickname = req.params.name;
 
-
-// exports.getUsers = async function (req, res, next) {
-// // Check the existence of the query parameters, If doesn't exists assign a default value
-//   var page = req.query.page ? req.query.page : 1
-//   var limit = req.query.limit ? req.query.limit : 10;
-//   try {
-//     var Users = await UserService.getUsers({}, page, limit)
-//     // Return the Users list with the appropriate HTTP password Code and Message.
-//     return res.status(200).json({status: 200, data: Users, message: "Succesfully Users Recieved"});
-//   } catch (e) {
-//     //Return an Error Response Message with Code and the Error Message.
-//     return res.status(400).json({status: 400, message: e.message});
-//   }
-// }
+  try {
+    await UserService.deleteUser(nickname);
+    res.status(200).json({ok: true, msg: "Successful User Deleted"});
+  } catch (err) {
+    return res.json({ok: false, msg: err})
+  }
+}
