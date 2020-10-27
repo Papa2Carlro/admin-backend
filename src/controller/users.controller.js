@@ -63,7 +63,7 @@ exports.loginUser = async function (req, res, next) {
   }
 }
 
-// Send Mail
+// Send Mail Controller
 exports.sendPassword = async function (req, res, next) {
   const email = req.body.email
 
@@ -75,7 +75,7 @@ exports.sendPassword = async function (req, res, next) {
   }
 }
 
-// Change Hash
+// Check Hash Empty Controller
 exports.changeHash = async function (req, res, next) {
   const hash = req.body.hash
 
@@ -87,7 +87,7 @@ exports.changeHash = async function (req, res, next) {
   }
 }
 
-// Change Password
+// Change User Password Controller
 exports.changePassword = async function (req, res, next) {
   const password = req.body.password
   const hash = req.body.hash
@@ -100,7 +100,7 @@ exports.changePassword = async function (req, res, next) {
   }
 }
 
-// Get User
+// Getters User Setting Controller
 exports.getUser = async function (req, res, next) {
   const nickname = req.params.name
 
@@ -122,6 +122,7 @@ exports.getUsers = async function (req, res, next) {
   }
 }
 
+// Save User Setting Controller
 exports.saveUser = async function (req, res, next) {
   const nickname = req.params.name
   let errField = {}
@@ -157,6 +158,7 @@ exports.saveUser = async function (req, res, next) {
   }
 }
 
+// Remove User Controller
 exports.removeUser = async function (req, res, next) {
   const nickname = req.params.name;
 
