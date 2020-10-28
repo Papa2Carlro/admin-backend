@@ -126,13 +126,18 @@ exports.sendPassword = async function (email) {
   }
 }
 
-exports.changePassword = async function (password, hash) {
+exports.changePassword = async function (password, hash = '', nickname = '') {
   // Hash password
   const hashedPassword = bcrypt.hashSync(password, 8);
 
   try {
-    const _detail = await User.findOne({modify: hash})
+    const query = hash ? {modify: hash} : {nickname: nickname}
+
+    const _detail = await User.findOne(query)
     if (!_detail) throw 'Пользователь не найден'
+
+    const passwordIsValid = bcrypt.compareSync(password, _detail.password);
+    if (passwordIsValid) throw "Новый пароль не должен совпадать с старым"
 
     const messages = {
       to: _detail.email,
@@ -147,7 +152,7 @@ exports.changePassword = async function (password, hash) {
       <p>Данное письмо не требует ответа.</p>`
     }
 
-    await User.findOneAndUpdate({modify: hash}, {password: hashedPassword, modify: ''}, {returnOriginal: false})
+    await User.findOneAndUpdate(query, {password: hashedPassword, modify: ''}, {returnOriginal: false})
     await mailer(messages)
   } catch (err) {
     // return a Error message describing the reason

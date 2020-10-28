@@ -89,11 +89,12 @@ exports.changeHash = async function (req, res, next) {
 
 // Change User Password Controller
 exports.changePassword = async function (req, res, next) {
-  const password = req.body.password
   const hash = req.body.hash
+  const password = req.body.password
+  const nickname = req.body.nickname
 
   try {
-    await UserService.changePassword(password, hash)
+    await UserService.changePassword(password, hash, nickname)
     return res.status(201).json({ok: true, msg: 'Пароль успешно изменен'})
   } catch (err) {
     return res.json({ok: false, msg: err})
@@ -140,9 +141,7 @@ exports.saveUser = async function (req, res, next) {
     // Error Event
     await UserService.getUserByEmail(User.email, (err, user) => {
       if (user) {
-        if (User.email !== user.email) {
-          errField.email = 'Такой email уже зарегистрирован!'
-        }
+        if (User.email !== user.email) errField.email = 'Такой email уже зарегистрирован!'
       }
     })
     // Empty Field
@@ -164,7 +163,7 @@ exports.removeUser = async function (req, res, next) {
 
   try {
     await UserService.deleteUser(nickname);
-    res.status(200).json({ok: true, msg: "Successful User Deleted"});
+    return res.status(200).json({ok: true, msg: "Пользователь удален"});
   } catch (err) {
     return res.json({ok: false, msg: err})
   }
